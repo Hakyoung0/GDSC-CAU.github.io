@@ -28,7 +28,7 @@
 
       <div v-for="ftarticle of featured" :key="ftarticle" class="nthz hidden md:block">
         <!-- <nuxt-link :to="{ name: 'slug', params: { slug: ftarticle.slug } }"> -->
-        <nuxt-link :to='`article/${ftarticle.slug}`'>
+        <nuxt-link :to='`/articles/${ftarticle.slug}`'>
           <div class="h-72 md:h-96 custom-radius group">
             <div class="h-3/5 flex items-center justify-center">
               <div class="featbox">
@@ -46,7 +46,7 @@
 
       <div v-for="featarticle of featuredone" :key="featarticle" class="block md:hidden">
         <!-- <nuxt-link :to="{ name: 'slug', params: { slug: featarticle.slug } }"> -->
-        <nuxt-link :to='`article/${featarticle.slug}`'>
+        <nuxt-link :to='`/articles/${featarticle.slug}`'>
           <div class="back-yellow rounded-lg h-52 py-5 px-6 relative">
             <div>
               <p class="poppins text-gray-800">{{featarticle.category}}</p>
@@ -81,15 +81,14 @@
 
     <div class="mt-14 md:mt-24 mb-6 md:mb-10 flex justify-between items-center max-w-6xl mx-auto px-6">
         <div class="text-3xl md:text-4xl text-gray-800 font-medium poppins">Latest Articles</div>
-        <nuxt-link to="all-articles">
+        <nuxt-link to="/articles">
           <div class="text-base text-blue-500 poppins hover:underline hidden md:block">See All Articles</div>
         </nuxt-link>
     </div>
 
     <div class="max-w-6xl grid grid-cols-1 colspan mt-5 md:mt-8 max-w-6xl mx-auto px-6">
         <div class="group" v-for="article of articles" :key="article">
-            <!-- <nuxt-link :to="{ name: 'slug', params: { slug: article.slug } }"> -->
-            <nuxt-link :to='`article/${article.slug}`'>
+            <nuxt-link :to='`/articles/${article.slug}`'>
                 <div class="article-inner flex justify-between items-center border-t py-5 md:py-8 border-gray-600">
                   <div class="pr-4">
                       <p class="mb-1 md:mb-1.5 text-sm md:text-sm text-gray-400">{{article.category}} · {{article.author}}</p>
@@ -104,20 +103,51 @@
         </div>
 
         <div class="flex justify-center pt-1 block md:hidden">
-          <nuxt-link to="all-articles" class="poppins text-blue-500 text-center text-sm">
+          <nuxt-link to="/articles" class="poppins text-blue-500 text-center text-sm">
             See All Articles
           </nuxt-link>
         </div>
     </div>
 
+<!-- 최신 프로젝트 -->
+
+    <div class="mt-14 md:mt-24 mb-6 md:mb-10 flex justify-between items-center max-w-6xl mx-auto px-6">
+        <div class="text-3xl md:text-4xl text-gray-800 font-medium poppins">Latest Projects</div>
+        <nuxt-link to="/projects">
+          <div class="text-base text-blue-500 poppins hover:underline hidden md:block">See All Projects</div>
+        </nuxt-link>
+    </div>
+
+    <div class="max-w-6xl grid grid-cols-1 colspan mt-5 md:mt-8 max-w-6xl mx-auto px-6 pb-16 md:pb-28">
+        <div class="group" v-for="article of proArticles" :key="article">
+            <nuxt-link :to='`/projects/${article.slug}`'>
+                <div class="article-inner flex justify-between items-center border-t py-5 md:py-8 border-gray-600">
+                  <div class="pr-4">
+                      <p class="mb-1 md:mb-1.5 text-sm md:text-sm text-gray-400">{{article.author}}</p>
+                      <h2 class="mb-1 md:mb-1.5 text-lg md:text-xl font-medium poppins text-gray-800">{{ article.title }}</h2>
+                      <p class=" text-sm md:text-base text-gray-600 custom-text">{{article.description}}</p>
+                  </div>
+                  <div class="pl-4 pr-6 hidden md:block">
+                    <ExternalLinkLogo class="fill-current text-gray-400 group-hover:text-gray-700 transition duration-200" />
+                  </div>
+                </div>
+            </nuxt-link>
+        </div>
+
+        <div class="flex justify-center pt-1 block md:hidden">
+          <nuxt-link to="/projects" class="poppins text-blue-500 text-center text-sm">
+            See All Projects
+          </nuxt-link>
+        </div>
+    </div>
 
 <!-- 카테고리 -->
 
-    <div class="mt-10 md:mt-20 pb-7 md:pb-10 flex justify-between items-center max-w-6xl mx-auto px-6">
+    <!-- <div class="mt-10 md:mt-20 pb-7 md:pb-10 flex justify-between items-center max-w-6xl mx-auto px-6">
         <div class="text-3xl md:text-4xl text-gray-800 font-medium poppins">Categories</div>
     </div>
 
-    <Category />
+    <Category /> -->
 
   </div>
 </div>
@@ -125,28 +155,30 @@
 
 <script>
 export default {
-  async asyncData({ $content, params }) {
-    const articles = await $content('blog', params.slug)
-      .only(['title', 'description', 'img', 'datetime', 'category', 'author', 'slug'])
+  async asyncData({ $content }) {
+    const articles = await $content('articles')
       .sortBy('createdAt', 'desc')
       .limit(5)
       .fetch();
-    const featured = await $content('blog', params.slug)
+    const proArticles = await $content('projects')
+      .sortBy('createdAt', 'desc')
+      .limit(5)
+      .fetch();
+    const featured = await $content('articles')
       .where({featured: 'Featured'})
-      .only(['title', 'description', 'img', 'datetime', 'category', 'author', 'slug'])
-      .sortBy('updatedAt', 'desc')
+      .sortBy('createdAt', 'desc')
       .limit(3)
       .fetch();
-    const featuredone = await $content('blog', params.slug)
+    const featuredone = await $content('articles')
       .where({featured: 'Featured'})
-      .only(['title', 'description', 'img', 'datetime', 'category', 'author', 'slug'])
-      .sortBy('updatedAt', 'desc')
+      .sortBy('createdAt', 'desc')
       .limit(1)
       .fetch();
     return {
       articles,
       featured,
-      featuredone
+      featuredone,
+      proArticles
     }
   },
     methods: {
